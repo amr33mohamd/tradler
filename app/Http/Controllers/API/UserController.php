@@ -1,6 +1,9 @@
 <?php
 namespace App\Http\Controllers\API;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
+use App\Services\UserService;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Validator;
@@ -9,46 +12,42 @@ use App\Http\Resources\User as UserResource;
 class UserController extends BaseController
 {
     /**
+     * @var postService
+     */
+    protected $userService;
+
+    /**
+     * PostController Constructor
+     *
+     * @param UserService $userService
+     *
+     */
+    public function __construct(UserService $userService)
+    {
+        $this->userService = $userService;
+    }
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
      */
     public function index()
     {
-        $users = User::all();
-        return $this->sendResponse(UserResource::collection($users), 'Users Retrieved Successfully.');
+        return $this->sendResponse(
+            UserResource::collection($this->userService->getAllUsers()),
+            'Users Retrieved Successfully.',true);
     }
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
 
-    }
     /**
      * Store a newly created resource in storage.
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
-        $input = $request->all();
-
-        $validator = Validator::make($input, [
-            'name' => 'required|min:3 ',
-            'email' => 'required|email',
-            'password'=>'required|min:6'
-        ]);
-
-        if($validator->fails()){
-            return $this->sendError('Validation Error.', $validator->errors());
-        }
-
-        $user = User::create($input);
-
+        $validated = $request->validated();
+        $user = $this->userService->createUser($validated);
         return $this->sendResponse(new UserResource($user), 'User Created Successfully.');
     }
     /**
@@ -57,26 +56,12 @@ class UserController extends BaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(UpdateUserRequest $id)
     {
-        $user = User::find($id);
-
-        if (is_null($user)) {
-            return $this->sendError('User not found.');
-        }
-
+        $user = $this->userService->getUserById($id->user);
         return $this->sendResponse(new UserResource($user), 'User Retrieved Successfully.');
     }
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
+
     /**
      * Update the specified resource in storage.
      *
@@ -84,22 +69,10 @@ class UserController extends BaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(UpdateUserRequest $request, $id)
     {
-        $input = $request->all();
-
-        $validator = Validator::make($input, [
-            'email' => 'email|nullable',
-            'name'=> 'min:3|nullable',
-            'password'=>'min:6|nullable'
-        ]);
-
-        if($validator->fails()){
-            return $this->sendError('Validation Error.', $validator->errors());
-        }
-        $user = User::find($id)->first();
-        $user->update($input);
-
+        $validated = $request->validated();
+        $user = $this->userService->updateUser($id,$validated);
         return $this->sendResponse(new UserResource($user), 'User Updated Successfully.');
     }
     /**
@@ -108,11 +81,11 @@ class UserController extends BaseController
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(UpdateUserRequest $id)
     {
-        $user = User::find($id);
-        $user->delete();
 
+        $this->userService->deleteUser($id->user);
         return $this->sendResponse([], 'User Deleted Successfully.');
+
     }
 }
