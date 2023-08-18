@@ -30,20 +30,20 @@ To run this application, you need the following:
 
    ```shell
    git clone <repository-url>
-````
+```
 
-1. Install dependencies:
+2. Install dependencies:
 
    ```shell
    composer install
    ```
 
-1. Configure the environment variables:
+3. Configure the environment variables:
 
    - Duplicate the `.env.example` file and rename it to `.env`.
    - Update the `.env` file with your Redis and MySQL database connection details.
 
-1. Migrate the database:
+4. Migrate the database:
 
    ```shell
    php artisan migrate
