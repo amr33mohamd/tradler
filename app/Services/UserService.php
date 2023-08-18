@@ -3,6 +3,7 @@
 
 namespace App\Services;
 
+use App\Jobs\SendEmailQueueJob;
 use App\Models\User;
 use App\Repositories\UserRepository;
 
@@ -41,6 +42,7 @@ class UserService
 
     public function createUser(array $userDetails)
     {
+        dispatch(new SendEmailQueueJob($userDetails['email']));
         return $this->userRepository->createUser($userDetails);
     }
 
