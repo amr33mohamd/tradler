@@ -11,3 +11,6 @@ environments:
             - 'php artisan event:cache'
         deploy:
           - 'php artisan migrate --force'
+        commands:
+          - name: queue
+            command: "php /var/task/artisan queue:work redis --sleep=3 --tries=3"
