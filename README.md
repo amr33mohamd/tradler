@@ -1,6 +1,4 @@
-Certainly! Here's the README file content formatted as Markdown code:
 
-````markdown
 # Laravel Vapor RESTful API with Redis Queue Worker
 
 This repository contains a RESTful API built with Laravel Vapor, utilizing a Redis queue worker for background job processing. The API provides endpoints for managing users and leverages MySQL for data storage.
