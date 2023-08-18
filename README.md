@@ -30,7 +30,7 @@ To run this application, you need the following:
 
    ```shell
    git clone <repository-url>
-```
+   ```
 
 2. Install dependencies:
 
